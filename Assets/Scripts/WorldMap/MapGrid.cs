@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class MapGrid : CustomMonoBehaviour
 {
     [Header("Grid Info")]
-    [SerializeField] private GameObject _gridAreaObject;
+    [SerializeField] private GameObject _gridAreaObject = null;
     [SerializeField] private int _halfXSize = 10;
     [SerializeField] private int _halfZSize = 10;
 
@@ -77,6 +78,39 @@ public class MapGrid : CustomMonoBehaviour
     }
 
 #if UNITY_EDITOR
+
+    private void OnGUI()
+    {
+        DrawBrickMenu(null);
+    }
+
+    private void OnEnable()
+    {
+        UnityEditor.SceneView.onSceneGUIDelegate -= DrawBrickMenu;
+        UnityEditor.SceneView.onSceneGUIDelegate += DrawBrickMenu;
+    }
+
+    private void OnDisable()
+    {
+        UnityEditor.SceneView.onSceneGUIDelegate -= DrawBrickMenu;
+    }
+
+    private void DrawBrickMenu(UnityEditor.SceneView view)
+    {
+        new UnityEditor.SerializedObject(this);
+
+        UnityEditor.Handles.BeginGUI();
+        GUILayout.BeginArea(new Rect(20, 20, 500, 80));
+
+        // 배경 GUI
+        GUI.backgroundColor = new Color(0.0f, 0.0f, 0.0f, 0.5f);
+        GUI.skin.box.normal.textColor = Color.white;
+        GUI.Box(new Rect(20, 20, 500, 80), "Blick Menu");
+
+        GUILayout.EndArea();
+        UnityEditor.Handles.EndGUI();
+    }
+
     void OnDrawGizmosSelected()
     {
         if (_startMapEditor == false)
