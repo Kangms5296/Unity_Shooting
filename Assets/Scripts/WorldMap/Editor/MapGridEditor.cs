@@ -44,23 +44,37 @@ public class MapGridEditor : Editor
 
     void OnSceneGUI()
     {
+        Event e = Event.current;
+
         // Grid는 마우스 클릭 Event만 처리
-        if (Event.current.type != EventType.MouseDown || Event.current.button != 0)
+        if (e.type != EventType.MouseDown &&
+            e.type != EventType.MouseDrag)
             return;
 
-        /*
-        if (Event.current.modifiers != EventModifiers.Control)
-            return;
-        */
+        // 마우스 좌표 계산
         var mousePosition = Event.current.mousePosition * EditorGUIUtility.pixelsPerPoint;
         mousePosition.y = Camera.current.pixelHeight - mousePosition.y;
 
         var Ray = Camera.current.ScreenPointToRay(mousePosition);
         if (Physics.Raycast(Ray, out RaycastHit hit))
         {
-            Debug.Log(hit.point);
+            if (e.control)
+            {
+                // Brick 생성
+                if (e.button == 0)
+                {
+                    Debug.Log("Brick 생성 : "+ _grid.CalGridPosition(hit.point));
 
 
+                }
+                // Brick 제거
+                else if (e.button == 1)
+                {
+                    Debug.Log("Brick 제거 : " + _grid.CalGridPosition(hit.point));
+
+
+                }
+            }
 
             // Hierachy Focus를 Grid로 유지
             int crtID = GUIUtility.GetControlID(FocusType.Passive);

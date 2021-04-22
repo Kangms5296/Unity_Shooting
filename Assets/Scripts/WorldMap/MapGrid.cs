@@ -10,7 +10,7 @@ public class MapGrid : CustomMonoBehaviour
     [SerializeField] private int _halfZSize = 10;
 
     [Header("Cell Info")]
-    [SerializeField] private int _cellSize = 1;
+    [SerializeField] [Range(1, 10)] private int _cellSize = 1;
     [SerializeField] private Color _color = Color.white;
 
     private bool _startMapEditor = false;
@@ -22,6 +22,9 @@ public class MapGrid : CustomMonoBehaviour
         get => _cellSize;
     }
 
+    /// <summary>
+    /// Map Editor 시작
+    /// </summary>
     public void StartMapEditor()
     {
         if (_startMapEditor)
@@ -32,7 +35,7 @@ public class MapGrid : CustomMonoBehaviour
         {
             GameObject temp = Instantiate(_gridAreaObject, transform);
 
-            temp.transform.position = new Vector3(0, -0.1f, 0);
+            temp.transform.position = transform.position + new Vector3(0, -0.1f, 0);
             temp.transform.localScale = new Vector3(_halfXSize * 0.2f, 1, _halfZSize * 0.2f);
             temp.name = _gridAreaObjectName;
         }
@@ -40,6 +43,9 @@ public class MapGrid : CustomMonoBehaviour
         _startMapEditor = true;
     }
 
+    /// <summary>
+    /// Map Editor 종료
+    /// </summary>
     public void EndMapEditor()
     {
         if (!_startMapEditor)
@@ -50,6 +56,24 @@ public class MapGrid : CustomMonoBehaviour
             DestroyImmediate(transform.Find(_gridAreaObjectName).gameObject);
 
         _startMapEditor = false;
+    }
+
+    public Vector3 CalGridPosition(Vector3 pos)
+    {
+        Vector3 newPos = new Vector3(Mathf.Floor(pos.x / _cellSize) * _cellSize + _cellSize / 2f,
+            transform.position.y, Mathf.Floor(pos.z / _cellSize) * _cellSize + _cellSize / 2f);
+
+        return newPos;
+    }
+
+    /// <summary>
+    /// 클릭 위치에 Brick 유무 확인 및 생성 혹은 제거
+    /// </summary>
+    /// <param name="newPos"></param>
+    /// <param name="destoryObject"></param>
+    public void CheckCompareObject(Vector3 newPos, bool destoryObject)
+    {
+
     }
 
 #if UNITY_EDITOR
