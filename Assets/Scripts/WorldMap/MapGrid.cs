@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 [ExecuteInEditMode]
 public class MapGrid : CustomMonoBehaviour
@@ -9,19 +11,18 @@ public class MapGrid : CustomMonoBehaviour
     [SerializeField] private GameObject _gridAreaObject = null;
     [SerializeField] private int _halfXSize = 10;
     [SerializeField] private int _halfZSize = 10;
+    [SerializeField] private Color _color = Color.white;
 
     [Header("Cell Info")]
     [SerializeField] [Range(1, 10)] private int _cellSize = 1;
-    [SerializeField] private Color _color = Color.white;
 
     private bool _startMapEditor = false;
 
-    private const string _gridAreaObjectName = "GridAreaObject";
+    [Header("Object Info")]
+    public List<GameObject> _brickList = null;
+    private int _brickIndex = 0;
 
-    public int CellSize
-    {
-        get => _cellSize;
-    }
+    private const string _gridAreaObjectName = "GridAreaObject";
 
     /// <summary>
     /// Map Editor 시작
@@ -79,11 +80,6 @@ public class MapGrid : CustomMonoBehaviour
 
 #if UNITY_EDITOR
 
-    private void OnGUI()
-    {
-        DrawBrickMenu(null);
-    }
-
     private void OnEnable()
     {
         UnityEditor.SceneView.onSceneGUIDelegate -= DrawBrickMenu;
@@ -97,21 +93,45 @@ public class MapGrid : CustomMonoBehaviour
 
     private void DrawBrickMenu(UnityEditor.SceneView view)
     {
+        if (_startMapEditor == false)
+            return;
+
         new UnityEditor.SerializedObject(this);
 
         UnityEditor.Handles.BeginGUI();
-        GUILayout.BeginArea(new Rect(20, 20, 500, 80));
+        GUILayout.BeginArea(new Rect(20, 20, 540, 190));
 
-        // 배경 GUI
-        GUI.backgroundColor = new Color(0.0f, 0.0f, 0.0f, 0.5f);
+        Color initTextColor = GUI.skin.box.normal.textColor;
+        Color initBgColor = GUI.backgroundColor;
+
         GUI.skin.box.normal.textColor = Color.white;
-        GUI.Box(new Rect(20, 20, 500, 80), "Blick Menu");
+        GUI.backgroundColor = new Color(0.2f, 0, 0, 0.3f);
+        GUI.Box(new Rect(20, 20, 520, 170), "Object Menu");
+
+        // Object List
+        int index = 0;
+        int brickCount = ((_brickList?.Count ?? 0) > 5) ? 5 : (_brickList?.Count ?? 0);
+        Texture2D t2D = null;
+        for (int i = _brickIndex; i < _brickIndex + brickCount; ++i)
+        {
+            int brickIndex = i % brickCount;
+
+            t2D = AssetPreview.GetAssetPreview(_brickList[brickIndex]);
+            GUI.DrawTexture(new Rect(40 + 100 * index, 45, 80, 80), t2D);
+
+            GUI.Button(new Rect(40 + 100 * index, 130, 80, 20), "선택");
+            GUI.Button(new Rect(40 + 100 * index, 155, 80, 20), "변경");
+            ++index;
+        }
+
+        GUI.skin.box.normal.textColor = initTextColor;
+        GUI.backgroundColor = initBgColor;
 
         GUILayout.EndArea();
         UnityEditor.Handles.EndGUI();
     }
 
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         if (_startMapEditor == false)
             return;

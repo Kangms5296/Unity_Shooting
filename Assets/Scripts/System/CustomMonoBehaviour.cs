@@ -4,6 +4,18 @@ using UnityEngine;
 
 public class CustomMonoBehaviour : MonoBehaviour
 {
+    GameObject _gameObject = null;
+    public new GameObject gameObject
+    {
+        get
+        {
+            if (_gameObject == null)
+                _gameObject = base.gameObject;
+
+            return _gameObject;
+        }
+    }
+
     Transform _transform = null;
     public new Transform transform
     {
