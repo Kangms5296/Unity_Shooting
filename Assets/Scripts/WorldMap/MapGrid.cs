@@ -16,20 +16,22 @@ public class MapGrid : CustomMonoBehaviour
     [Header("Cell Info")]
     [SerializeField] [Range(1, 10)] private int _cellSize = 1;
 
-    private bool _startMapEditor = false;
+    private bool _mapEditorStart = false;
+    public bool MapEditorStart => _mapEditorStart;
 
     [Header("Object Info")]
     public List<GameObject> _brickList = null;
-    private int _brickIndex = 0;
 
     private const string _gridAreaObjectName = "GridAreaObject";
+
+    private GameObject[] _prefabs;
 
     /// <summary>
     /// Map Editor 시작
     /// </summary>
     public void StartMapEditor()
     {
-        if (_startMapEditor)
+        if (_mapEditorStart)
             return;
 
         // Base Touch Area 생성
@@ -42,7 +44,7 @@ public class MapGrid : CustomMonoBehaviour
             temp.name = _gridAreaObjectName;
         }
 
-        _startMapEditor = true;
+        _mapEditorStart = true;
     }
 
     /// <summary>
@@ -50,14 +52,14 @@ public class MapGrid : CustomMonoBehaviour
     /// </summary>
     public void EndMapEditor()
     {
-        if (!_startMapEditor)
+        if (!_mapEditorStart)
             return;
 
         // Base Touch Area 제거
         if (transform.Find(_gridAreaObjectName) != null)
             DestroyImmediate(transform.Find(_gridAreaObjectName).gameObject);
 
-        _startMapEditor = false;
+        _mapEditorStart = false;
     }
 
     public Vector3 CalGridPosition(Vector3 pos)
@@ -80,60 +82,9 @@ public class MapGrid : CustomMonoBehaviour
 
 #if UNITY_EDITOR
 
-    private void OnEnable()
+    private void OnDrawGizmos()
     {
-        UnityEditor.SceneView.onSceneGUIDelegate -= DrawBrickMenu;
-        UnityEditor.SceneView.onSceneGUIDelegate += DrawBrickMenu;
-    }
-
-    private void OnDisable()
-    {
-        UnityEditor.SceneView.onSceneGUIDelegate -= DrawBrickMenu;
-    }
-
-    private void DrawBrickMenu(UnityEditor.SceneView view)
-    {
-        if (_startMapEditor == false)
-            return;
-
-        new UnityEditor.SerializedObject(this);
-
-        UnityEditor.Handles.BeginGUI();
-        GUILayout.BeginArea(new Rect(20, 20, 540, 190));
-
-        Color initTextColor = GUI.skin.box.normal.textColor;
-        Color initBgColor = GUI.backgroundColor;
-
-        GUI.skin.box.normal.textColor = Color.white;
-        GUI.backgroundColor = new Color(0.2f, 0, 0, 0.3f);
-        GUI.Box(new Rect(20, 20, 520, 170), "Object Menu");
-
-        // Object List
-        int index = 0;
-        int brickCount = ((_brickList?.Count ?? 0) > 5) ? 5 : (_brickList?.Count ?? 0);
-        Texture2D t2D = null;
-        for (int i = _brickIndex; i < _brickIndex + brickCount; ++i)
-        {
-            int brickIndex = i % brickCount;
-
-            t2D = AssetPreview.GetAssetPreview(_brickList[brickIndex]);
-            GUI.DrawTexture(new Rect(40 + 100 * index, 45, 80, 80), t2D);
-
-            GUI.Button(new Rect(40 + 100 * index, 130, 80, 20), "선택");
-            GUI.Button(new Rect(40 + 100 * index, 155, 80, 20), "변경");
-            ++index;
-        }
-
-        GUI.skin.box.normal.textColor = initTextColor;
-        GUI.backgroundColor = initBgColor;
-
-        GUILayout.EndArea();
-        UnityEditor.Handles.EndGUI();
-    }
-
-    void OnDrawGizmos()
-    {
-        if (_startMapEditor == false)
+        if (_mapEditorStart == false)
             return;
 
         if (_cellSize <= 0
