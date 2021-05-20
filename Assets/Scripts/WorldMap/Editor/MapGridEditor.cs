@@ -102,7 +102,7 @@ public class MapGridEditor : Editor
             return;
 
         UnityEditor.Handles.BeginGUI();
-        GUILayout.BeginArea(new Rect(20, 20, 540, 190));
+        GUILayout.BeginArea(new Rect(20, 20, 100 * _grid.ObjectCacheCount + 40, 190));
 
         Color initBoxTextColor = GUI.skin.box.normal.textColor;
         Color initBtnTextColor = GUI.skin.button.normal.textColor;
@@ -110,31 +110,35 @@ public class MapGridEditor : Editor
 
         GUI.skin.box.normal.textColor = Color.white;
         GUI.backgroundColor = new Color(0.2f, 0, 0, 0.3f);
-        GUI.Box(new Rect(20, 20, 520, 170), "Object Menu");
+        GUI.Box(new Rect(20, 20, 100 * _grid.ObjectCacheCount + 20, 170), "Object Menu");
 
         GUI.skin.button.normal.textColor = Color.white;
 
+
+        
         // Object List
-        int brickCount = ((_grid._brickList?.Count ?? 0) > 5) ? 5 : (_grid._brickList?.Count ?? 0);
         Texture2D t2D = null;
-        for (int index = 0; index < 5; ++index)
+        for (int index = 0; index < _grid.ObjectCacheCount; ++index)
         {
-            int brickIndex = index % brickCount;
-
-            t2D = AssetPreview.GetAssetPreview(_grid._brickList[brickIndex]);
-            GUI.DrawTexture(new Rect(40 + 100 * index, 45, 80, 80), t2D);
-
+            // 캐시 오브젝트 커서
             if (GUI.Button(new Rect(40 + 100 * index, 130, 80, 20), "선택"))
             {
 
             }
-
+            // 캐시 오브젝트 변경
             if (GUI.Button(new Rect(40 + 100 * index, 155, 80, 20), "변경"))
             {
-
+                ObjectSelectorEditor selector = (ObjectSelectorEditor)EditorWindow.GetWindow(typeof(ObjectSelectorEditor), true, "Object Selector");
+                selector.Init(ObjectSelectorEditor.BrickPrefabPath, 3);
             }
-        }
 
+            if (_grid._cachedObjects.Count <= index || _grid._cachedObjects[index] == null)
+                continue;
+
+            t2D = AssetPreview.GetAssetPreview(_grid._cachedObjects[index]);
+            GUI.DrawTexture(new Rect(40 + 100 * index, 45, 80, 80), t2D);
+        }
+        
         GUI.skin.box.normal.textColor = initBoxTextColor;
         GUI.skin.button.normal.textColor = initBtnTextColor;
         GUI.backgroundColor = initBgColor;

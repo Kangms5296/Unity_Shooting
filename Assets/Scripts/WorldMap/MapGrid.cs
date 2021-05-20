@@ -20,11 +20,12 @@ public class MapGrid : CustomMonoBehaviour
     public bool MapEditorStart => _mapEditorStart;
 
     [Header("Object Info")]
-    public List<GameObject> _brickList = null;
+    [SerializeField] [Range(1, 8)] private int _objectCacheCount = 5;
+    public int ObjectCacheCount => _objectCacheCount;
+
+    public List<GameObject> _cachedObjects = null;
 
     private const string _gridAreaObjectName = "GridAreaObject";
-
-    private GameObject[] _prefabs;
 
     /// <summary>
     /// Map Editor 시작
