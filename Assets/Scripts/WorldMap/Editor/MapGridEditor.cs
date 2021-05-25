@@ -114,8 +114,6 @@ public class MapGridEditor : Editor
 
         GUI.skin.button.normal.textColor = Color.white;
 
-
-        
         // Object List
         Texture2D t2D = null;
         for (int index = 0; index < _grid.ObjectCacheCount; ++index)
@@ -129,7 +127,12 @@ public class MapGridEditor : Editor
             if (GUI.Button(new Rect(40 + 100 * index, 155, 80, 20), "변경"))
             {
                 ObjectSelectorEditor selector = (ObjectSelectorEditor)EditorWindow.GetWindow(typeof(ObjectSelectorEditor), true, "Object Selector");
-                selector.Init(ObjectSelectorEditor.BrickPrefabPath, 3);
+                selector.Init(ObjectSelectorEditor.BrickPrefabPath, index, (valueIndex, value) =>
+                {
+                    _grid._cachedObjects[valueIndex] = (GameObject)value;
+
+                    EditorUtility.SetDirty(_grid);
+                });
             }
 
             if (_grid._cachedObjects.Count <= index || _grid._cachedObjects[index] == null)

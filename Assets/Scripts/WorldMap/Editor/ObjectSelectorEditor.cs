@@ -3,27 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System;
 
 public class ObjectSelectorEditor : EditorWindow
 {
     // Object Path
     public static string BrickPrefabPath = "Assets\\Prefabs\\Bricks";
 
-    private int _colCount = 0;
     private List<GameObject> _prefabs = new List<GameObject>();
 
-    private bool _isInit = false; 
-    public void Init(string path = "", int colCount = 3)
+    private int _index = 0;
+    private Action<int, object> _callback = null;
+    public void Init(string path = "", int index = 0, Action<int, object> callback = null)
     {
+        _index = index;
+        _callback = callback;
+
         ReadAllObject(path);
 
-        _colCount = colCount;
-
-        _isInit = true;
+        EditorWindow.GetWindow(typeof(ObjectSelectorEditor));
     }
 
+    private bool _readFinish = false;
     private void ReadAllObject(string path)
     {
+        _readFinish = false;
+
         _prefabs.Clear();
 
         // path 경로의 오브젝트 캐싱
@@ -36,12 +41,14 @@ public class ObjectSelectorEditor : EditorWindow
 
             _prefabs.Add(temp);
         }
+
+        _readFinish = true;
     }
 
     Vector2 _scrollPos = Vector2.zero;
     private void OnGUI()
     {
-        if (!_isInit)
+        if (!_readFinish)
             return;
 
         // Editor 상하 스크롤
@@ -51,18 +58,23 @@ public class ObjectSelectorEditor : EditorWindow
         int count = 0;
         foreach (GameObject prefab in _prefabs)
         {
-            if (count % _colCount == 0)
+            if (count % 3 == 0)
                 EditorGUILayout.BeginHorizontal();
-            count++;
 
             // 오브젝트 선택 버튼
             t2D = AssetPreview.GetAssetPreview(prefab);
+            if (t2D == null)
+                continue;
+
             if (GUILayout.Button(new GUIContent(t2D, t2D.name), GUILayout.Height(80), GUILayout.Width(80)))
             {
+                _callback(_index, _prefabs[count]);
+
                 EditorWindow.focusedWindow.Close();
             }
 
-            if (count % _colCount == 0)
+            count++;
+            if (count % 3 == 0)
                 EditorGUILayout.EndHorizontal();
         }
 
