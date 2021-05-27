@@ -298,15 +298,14 @@ MonoBehaviour:
   _halfZSize: 10
   _color: {r: 1, g: 1, b: 1, a: 1}
   _cellSize: 1
-  _brickList:
-  - {fileID: 1127292094840876, guid: ce23644026f127f4ba6e0345b7e79ab9, type: 3}
-  - {fileID: 1810284914148576, guid: 056091f7041f4b64091cd3d39a52bd3b, type: 3}
-  - {fileID: 1170724161450374, guid: a8fa1c076f83fb94f986f0141a28ac23, type: 3}
-  - {fileID: 1979290889500462, guid: 98dd8e405a3f26848b63e1b78dfb7c5b, type: 3}
-  - {fileID: 1954857893755312, guid: ae3bc788ba8ef1a409b06711e992b4dd, type: 3}
-  - {fileID: 1966532178924628, guid: f8f773d9112577a4c98178cc8287a3ee, type: 3}
-  - {fileID: 1063049674197416, guid: 7352e9e4e300ae34bae5be5828840ef6, type: 3}
-  - {fileID: 1890052976583762, guid: 53b9e2e8c2c1ed2439a09c2ab3fb11e4, type: 3}
+  _objectCacheCount: 5
+  _curSelectIndex: -1
+  _cachedObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!4 &1875932939
 Transform:
   m_ObjectHideFlags: 0

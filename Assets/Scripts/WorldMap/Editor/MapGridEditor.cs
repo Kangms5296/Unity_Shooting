@@ -26,6 +26,8 @@ public class MapGridEditor : Editor
             EndMapEditor();
         EditorGUILayout.EndHorizontal();
 
+        if (GUILayout.Button("Regenerate GridAreaObject"))
+            RegenerateGridAreaObject();
     }
 
     private void StartMapEditor()
@@ -36,6 +38,11 @@ public class MapGridEditor : Editor
     private void EndMapEditor()
     {
         _grid.EndMapEditor();
+    }
+
+    private void RegenerateGridAreaObject()
+    {
+        _grid.RegenerateGridAreaObject();
     }
     #endregion
 

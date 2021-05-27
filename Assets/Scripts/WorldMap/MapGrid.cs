@@ -64,6 +64,26 @@ public class MapGrid : CustomMonoBehaviour
         _mapEditorStart = false;
     }
 
+    /// <summary>
+    /// GridAreaObject 재생성
+    /// </summary>
+    public void RegenerateGridAreaObject()
+    {
+        // Base Touch Area 제거
+        if (transform.Find(_gridAreaObjectName) != null)
+            DestroyImmediate(transform.Find(_gridAreaObjectName).gameObject);
+
+        // Base Touch Area 생성
+        if (_gridAreaObject != null)
+        {
+            GameObject temp = Instantiate(_gridAreaObject, transform);
+
+            temp.transform.position = transform.position + new Vector3(0, -0.1f, 0);
+            temp.transform.localScale = new Vector3(_halfXSize * _cellSize * 0.2f, 1, _halfZSize * _cellSize * 0.2f);
+            temp.name = _gridAreaObjectName;
+        }
+    }
+
     public Vector3 CalGridPosition(Vector3 pos)
     {
         Vector3 newPos = new Vector3(Mathf.Floor(pos.x / _cellSize) * _cellSize + _cellSize / 2f,
