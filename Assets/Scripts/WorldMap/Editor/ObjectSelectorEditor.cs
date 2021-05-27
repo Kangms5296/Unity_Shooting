@@ -53,9 +53,19 @@ public class ObjectSelectorEditor : EditorWindow
 
         // Editor 상하 스크롤
         _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
-        
+
+        // Add None Object
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button(new GUIContent(""), GUILayout.Height(80), GUILayout.Width(80)))
+        {
+            _callback(_index, null);
+
+            EditorWindow.focusedWindow.Close();
+        }
+
+        // Add etc..
         Texture2D t2D = null;
-        int count = 0;
+        int count = 1;
         foreach (GameObject prefab in _prefabs)
         {
             if (count % 3 == 0)
@@ -68,7 +78,7 @@ public class ObjectSelectorEditor : EditorWindow
 
             if (GUILayout.Button(new GUIContent(t2D, t2D.name), GUILayout.Height(80), GUILayout.Width(80)))
             {
-                _callback(_index, _prefabs[count]);
+                _callback(_index, _prefabs[count - 1]);
 
                 EditorWindow.focusedWindow.Close();
             }

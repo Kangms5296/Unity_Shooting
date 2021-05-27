@@ -139,7 +139,8 @@ public class MapGridEditor : Editor
                 continue;
 
             t2D = AssetPreview.GetAssetPreview(_grid._cachedObjects[index]);
-            GUI.DrawTexture(new Rect(40 + 100 * index, 45, 80, 80), t2D);
+            if (t2D != null)
+                GUI.DrawTexture(new Rect(40 + 100 * index, 45, 80, 80), t2D);
         }
         
         GUI.skin.box.normal.textColor = initBoxTextColor;
