@@ -118,17 +118,23 @@ public class MapGridEditor : Editor
         Texture2D t2D = null;
         for (int index = 0; index < _grid.ObjectCacheCount; ++index)
         {
-            // 캐시 오브젝트 커서
+            // 캐시 오브젝트 선택
             if (GUI.Button(new Rect(40 + 100 * index, 130, 80, 20), "선택"))
             {
-
+                if (_grid._cachedObjects[index] != null)
+                    _grid._curSelectIndex = index;
             }
             // 캐시 오브젝트 변경
             if (GUI.Button(new Rect(40 + 100 * index, 155, 80, 20), "변경"))
             {
+                // 새 Object를 Cache 목록에 올린다.
                 ObjectSelectorEditor selector = (ObjectSelectorEditor)EditorWindow.GetWindow(typeof(ObjectSelectorEditor), true, "Object Selector");
                 selector.Init(ObjectSelectorEditor.BrickPrefabPath, index, (valueIndex, value) =>
                 {
+                    // 현재 목록의 이전 선택 정보를 삭제
+                    if (_grid._curSelectIndex == valueIndex)
+                        _grid._curSelectIndex = -1;
+
                     _grid._cachedObjects[valueIndex] = (GameObject)value;
 
                     EditorUtility.SetDirty(_grid);
@@ -142,6 +148,10 @@ public class MapGridEditor : Editor
             if (t2D != null)
                 GUI.DrawTexture(new Rect(40 + 100 * index, 45, 80, 80), t2D);
         }
+
+        // 선택한 캐시 오브젝트 표시
+        if (_grid._curSelectIndex != -1 && _grid._cachedObjects[_grid._curSelectIndex] != null )
+            GUI.DrawTexture(new Rect(40 + 100 * _grid._curSelectIndex, 40, 5, 5), Texture2D.whiteTexture);
         
         GUI.skin.box.normal.textColor = initBoxTextColor;
         GUI.skin.button.normal.textColor = initBtnTextColor;

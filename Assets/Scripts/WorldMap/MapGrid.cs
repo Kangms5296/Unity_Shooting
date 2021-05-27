@@ -23,6 +23,7 @@ public class MapGrid : CustomMonoBehaviour
     [SerializeField] [Range(1, 8)] private int _objectCacheCount = 5;
     public int ObjectCacheCount => _objectCacheCount;
 
+    [HideInInspector] public int _curSelectIndex = -1;
     [HideInInspector] public List<GameObject> _cachedObjects = null;
 
     private const string _gridAreaObjectName = "GridAreaObject";
