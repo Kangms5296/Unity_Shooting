@@ -42,7 +42,7 @@ public class MapGrid : CustomMonoBehaviour
             GameObject temp = Instantiate(_gridAreaObject, transform);
 
             temp.transform.position = transform.position + new Vector3(0, -0.1f, 0);
-            temp.transform.localScale = new Vector3(_halfXSize * 0.2f, 1, _halfZSize * 0.2f);
+            temp.transform.localScale = new Vector3(_halfXSize * _cellSize * 0.2f, 1, _halfZSize * _cellSize * 0.2f);
             temp.name = _gridAreaObjectName;
         }
 
@@ -102,17 +102,17 @@ public class MapGrid : CustomMonoBehaviour
             , Mathf.Floor(transform.position.z / _cellSize) * _cellSize);
 
         // Vertical Grid 표시
-        for (float z = pos.z - _halfZSize; z <= pos.z + _halfZSize; z += _cellSize)
+        for (float z = pos.z - _halfZSize * _cellSize; z <= pos.z + _halfZSize * _cellSize; z += _cellSize)
         {
-            Gizmos.DrawLine(new Vector3(_halfXSize + pos.x, pos.y, Mathf.Floor(z / _cellSize) * _cellSize),
-            new Vector3(-_halfXSize + pos.x, pos.y, Mathf.Floor(z / _cellSize) * _cellSize));
+            Gizmos.DrawLine(new Vector3(_halfXSize * _cellSize + pos.x, pos.y, Mathf.Floor(z / _cellSize) * _cellSize),
+            new Vector3(-_halfXSize * _cellSize + pos.x, pos.y, Mathf.Floor(z / _cellSize) * _cellSize));
         }
 
         // Horizontal Grid 표시
-        for (float x = pos.x - _halfXSize - 1; x < pos.x + _halfXSize; x += _cellSize)
+        for (float x = pos.x - _halfXSize * _cellSize - _cellSize; x < pos.x + _halfXSize * _cellSize; x += _cellSize)
         {
-            Gizmos.DrawLine(new Vector3(Mathf.Floor(x / _cellSize) * _cellSize + _cellSize, pos.y, _halfZSize + pos.z),
-            new Vector3(Mathf.Floor(x / _cellSize) * _cellSize + _cellSize, pos.y, -_halfZSize + pos.z));
+            Gizmos.DrawLine(new Vector3(Mathf.Floor(x / _cellSize) * _cellSize + _cellSize, pos.y, _halfZSize * _cellSize + pos.z),
+            new Vector3(Mathf.Floor(x / _cellSize) * _cellSize + _cellSize, pos.y, -_halfZSize * _cellSize + pos.z));
         }
     }
 #endif
