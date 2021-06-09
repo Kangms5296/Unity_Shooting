@@ -103,6 +103,7 @@ public class MapGrid : CustomMonoBehaviour
 
         GameObject newObject = Instantiate(target, transform);
         newObject.transform.position = newPos;
+        newObject.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
 
         EditingObject customObject = newObject.GetComponent<EditingObject>();
         _objectDic.Add(newPos, customObject);
