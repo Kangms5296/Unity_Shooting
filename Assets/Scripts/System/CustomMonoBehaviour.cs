@@ -33,13 +33,7 @@ public class CustomMonoBehaviour : MonoBehaviour
     /// </summary>
     public Vector3 position3
     {
-        get
-        {
-            if (_transform == null)
-                _transform = transform;
-
-            return _transform.position;
-        }
+        get => transform.position;
     }
 
     /// <summary>

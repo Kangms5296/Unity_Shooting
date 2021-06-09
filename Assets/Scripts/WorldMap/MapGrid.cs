@@ -15,9 +15,6 @@ public class MapGrid : CustomMonoBehaviour
     [Header("Cell Info")]
     [SerializeField] [Range(1, 10)] private int _cellSize = 1;
 
-    private bool _mapEditorStart = false;
-    public bool MapEditorStart => _mapEditorStart;
-
     [Header("Object Info")]
     [SerializeField] [Range(1, 8)] private int _objectCacheCount = 5;
     public int ObjectCacheCount => _objectCacheCount;
@@ -27,12 +24,16 @@ public class MapGrid : CustomMonoBehaviour
 
     private const string _gridAreaObjectName = "GridAreaObject";
 
+    private Dictionary<Vector3, EditingObject> _objectDic = new Dictionary<Vector3, EditingObject>();
+
+    public bool MapEditorStart { get; private set; } = false;
+
     /// <summary>
     /// Map Editor 시작
     /// </summary>
     public void StartMapEditor()
     {
-        if (_mapEditorStart)
+        if (MapEditorStart)
             return;
 
         // Base Touch Area 생성
@@ -45,7 +46,7 @@ public class MapGrid : CustomMonoBehaviour
             temp.name = _gridAreaObjectName;
         }
 
-        _mapEditorStart = true;
+        MapEditorStart = true;
     }
 
     /// <summary>
@@ -53,14 +54,14 @@ public class MapGrid : CustomMonoBehaviour
     /// </summary>
     public void EndMapEditor()
     {
-        if (!_mapEditorStart)
+        if (!MapEditorStart)
             return;
 
         // Base Touch Area 제거
         if (transform.Find(_gridAreaObjectName) != null)
             DestroyImmediate(transform.Find(_gridAreaObjectName).gameObject);
 
-        _mapEditorStart = false;
+        MapEditorStart = false;
     }
 
     /// <summary>
@@ -96,8 +97,15 @@ public class MapGrid : CustomMonoBehaviour
     /// </summary>
     public void InstantiateObject(Vector3 newPos, GameObject target)
     {
+        if (_objectDic.ContainsKey(newPos)
+            || target.GetComponent<EditingObject>() == null)
+            return;
+
         GameObject newObject = Instantiate(target, transform);
         newObject.transform.position = newPos;
+
+        EditingObject customObject = newObject.GetComponent<EditingObject>();
+        _objectDic.Add(newPos, customObject);
     }
 
     /// <summary>
@@ -108,6 +116,19 @@ public class MapGrid : CustomMonoBehaviour
         if (target.name == _gridAreaObjectName)
             return;
 
+        EditingObject customObject = target.GetComponent<EditingObject>();
+        Vector3 key = Vector3.zero;
+        foreach(var ob in _objectDic)
+        {
+            if (ob.Value == customObject)
+            {
+                key = ob.Key;
+                break;
+            }
+        }
+
+        if (key != Vector3.zero)
+            _objectDic.Remove(key);
         DestroyImmediate(target);
     }
 
@@ -115,7 +136,7 @@ public class MapGrid : CustomMonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (_mapEditorStart == false)
+        if (MapEditorStart == false)
             return;
 
         if (_cellSize <= 0
