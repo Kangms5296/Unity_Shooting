@@ -72,7 +72,8 @@ public class MapGridEditor : Editor
             {
                 if (e.alt)
                 {
-                    Vector3 hitPos = _grid.CalGridPosition(hit.point);
+                    Vector3 margin = (Camera.current.transform.position - hit.point).normalized * 0.1f;
+                    Vector3 hitPos = _grid.CalGridPosition(hit.point + margin);
 
                     // Obejct 생성
                     if (e.button == 0)
