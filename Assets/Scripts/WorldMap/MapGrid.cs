@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 [ExecuteInEditMode]
 public class MapGrid : CustomMonoBehaviour
@@ -87,19 +86,31 @@ public class MapGrid : CustomMonoBehaviour
     public Vector3 CalGridPosition(Vector3 pos)
     {
         Vector3 newPos = new Vector3(Mathf.Floor(pos.x / _cellSize) * _cellSize + _cellSize / 2f,
-            transform.position.y, Mathf.Floor(pos.z / _cellSize) * _cellSize + _cellSize / 2f);
+            Mathf.Floor((pos.y + 0.1f) / _cellSize) * _cellSize +_cellSize / 2f, Mathf.Floor(pos.z / _cellSize) * _cellSize + _cellSize / 2f);
 
         return newPos;
     }
 
     /// <summary>
-    /// 클릭 위치에 Brick 유무 확인 및 생성 혹은 제거
+    /// 클릭 위치에 Object 생성
     /// </summary>
-    /// <param name="newPos"></param>
-    /// <param name="destoryObject"></param>
-    public void CheckCompareObject(Vector3 newPos, bool destoryObject)
+    public void InstantiateObject(Vector3 newPos, GameObject target)
     {
+        GameObject newObject = Instantiate(target, transform);
+        newObject.transform.position = newPos;
 
+        _placedObjectInfoArr.Add(newObject);
+    }
+
+    /// <summary>
+    /// 클릭 위치에 Object 제거
+    /// </summary>
+    public void DestroyObject(GameObject target)
+    {
+        if (target.name == _gridAreaObjectName)
+            return;
+
+        DestroyImmediate(target);
     }
 
 #if UNITY_EDITOR

@@ -68,25 +68,26 @@ public class MapGridEditor : Editor
         var Ray = Camera.current.ScreenPointToRay(mousePosition);
         if (Physics.Raycast(Ray, out RaycastHit hit))
         {
-            // Grid는 마우스 클릭 Event만 처리
-            if (e.type == EventType.MouseDown ||
-                e.type == EventType.MouseDrag)
+            if (e.type == EventType.MouseDown)
             {
-                if (e.control)
+                if (e.alt)
                 {
-                    // Brick 생성
+                    Vector3 hitPos = _grid.CalGridPosition(hit.point);
+
+                    // Obejct 생성
                     if (e.button == 0)
                     {
-                        Debug.Log("Brick 생성 : " + _grid.CalGridPosition(hit.point));
-
-
+                        if (_grid._curSelectIndex >= 0 &&
+                            _grid._curSelectIndex < _grid._cachedObjects.Count &&
+                            _grid._cachedObjects[_grid._curSelectIndex] != null)
+                        {
+                            _grid.InstantiateObject(hitPos, _grid._cachedObjects[_grid._curSelectIndex]);
+                        }
                     }
-                    // Brick 제거
+                    // Obejct 제거
                     else if (e.button == 1)
                     {
-                        Debug.Log("Brick 제거 : " + _grid.CalGridPosition(hit.point));
-
-
+                         _grid.DestroyObject(hit.transform.gameObject);
                     }
 
                     // Hierachy Focus를 Grid로 유지
