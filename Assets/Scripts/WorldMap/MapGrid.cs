@@ -98,8 +98,6 @@ public class MapGrid : CustomMonoBehaviour
     {
         GameObject newObject = Instantiate(target, transform);
         newObject.transform.position = newPos;
-
-        _placedObjectInfoArr.Add(newObject);
     }
 
     /// <summary>
