@@ -46,6 +46,10 @@ public class MapGrid : CustomMonoBehaviour
             temp.name = _gridAreaObjectName;
         }
 
+        // Guide Object 생성
+        if (_curSelectIndex != -1)
+            OnChangeGuideObject(_cachedObjects[_curSelectIndex]);
+
         MapEditorStart = true;
     }
 
@@ -136,6 +140,44 @@ public class MapGrid : CustomMonoBehaviour
         if (key != Vector3.zero)
             _objectDic.Remove(key);
         DestroyImmediate(target);
+    }
+
+    private GameObject _curGuideObject = null;
+    private float _curGuideObjectHeight = 0;
+    public void OnChangeGuideObject(GameObject newGuideObject)
+    {
+        if (newGuideObject.GetComponent<EditingObject>() == null)
+            return;
+
+        // 이전 Guide 오브젝트 제거
+        if (_curGuideObject != null)
+            DestroyImmediate(_curGuideObject);
+
+        // 새 Guide 오브젝트 생성
+        _curGuideObject = Instantiate(newGuideObject, transform);
+
+        // Collider를 제거하므로, 미리 Height 값 계산 및 캐싱
+        _curGuideObjectHeight = (_curGuideObject.GetComponent<Collider>()?.bounds.size.y ?? 0) * 0.5f;
+
+        // 새 Guide 초기화
+        _curGuideObject.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+        _curGuideObject.GetComponent<Collider>().enabled = false;
+        _curGuideObject.SetActive(false);
+    }
+
+    public void OnSetGuideObject(Vector3 newPos, bool setActive = true)
+    {
+        if (_curGuideObject == null)
+            return;
+
+        if (setActive == false)
+        {
+            _curGuideObject.SetActive(false);
+            return;
+        }
+
+        _curGuideObject.SetActive(setActive);
+        _curGuideObject.transform.position = new Vector3(newPos.x, newPos.y + _curGuideObjectHeight, newPos.z);
     }
 
 #if UNITY_EDITOR

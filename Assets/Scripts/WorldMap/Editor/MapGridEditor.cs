@@ -70,6 +70,8 @@ public class MapGridEditor : Editor
         {
             if (e.type == EventType.MouseDown)
             {
+                _grid.OnSetGuideObject(Vector3.zero, false);
+
                 if (e.control)
                 {
                     Vector3 margin = (Camera.current.transform.position - hit.point).normalized * 0.1f;
@@ -88,7 +90,7 @@ public class MapGridEditor : Editor
                     // Obejct 제거
                     else if (e.button == 1)
                     {
-                         _grid.DestroyObject(hit.transform.gameObject);
+                        _grid.DestroyObject(hit.transform.gameObject);
                     }
 
                     // Hierachy Focus를 Grid로 유지
@@ -99,6 +101,17 @@ public class MapGridEditor : Editor
                     Event.current.Use();
                 }
             }
+            else if (e.type == EventType.MouseMove)
+            {
+                Vector3 margin = (Camera.current.transform.position - hit.point).normalized * 0.1f;
+                Vector3 hitPos = _grid.CalGridPosition(hit.point + margin);
+
+                _grid.OnSetGuideObject(hitPos);
+            }
+        }
+        else
+        {
+            _grid.OnSetGuideObject(Vector3.zero, false);
         }
     }
 
@@ -131,7 +144,10 @@ public class MapGridEditor : Editor
             if (GUI.Button(new Rect(40 + 100 * index, 130, 80, 20), "선택"))
             {
                 if (_grid._cachedObjects[index] != null)
+                {
                     _grid._curSelectIndex = index;
+                    _grid.OnChangeGuideObject(_grid._cachedObjects[index]);
+                }
             }
             // 캐시 오브젝트 변경
             if (GUI.Button(new Rect(40 + 100 * index, 155, 80, 20), "변경"))
