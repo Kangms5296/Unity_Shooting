@@ -70,7 +70,7 @@ public class MapGridEditor : Editor
         {
             if (e.type == EventType.MouseDown)
             {
-                if (e.alt)
+                if (e.control)
                 {
                     Vector3 margin = (Camera.current.transform.position - hit.point).normalized * 0.1f;
                     Vector3 hitPos = _grid.CalGridPosition(hit.point + margin);
