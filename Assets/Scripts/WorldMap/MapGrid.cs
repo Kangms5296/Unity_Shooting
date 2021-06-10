@@ -87,7 +87,7 @@ public class MapGrid : CustomMonoBehaviour
     public Vector3 CalGridPosition(Vector3 pos)
     {
         Vector3 newPos = new Vector3(Mathf.Floor(pos.x / _cellSize) * _cellSize + _cellSize / 2f,
-            Mathf.Floor((pos.y + 0.1f) / _cellSize) * _cellSize +_cellSize / 2f, Mathf.Floor(pos.z / _cellSize) * _cellSize + _cellSize / 2f);
+         0, Mathf.Floor(pos.z / _cellSize) * _cellSize + _cellSize / 2f);
 
         return newPos;
     }
@@ -101,10 +101,15 @@ public class MapGrid : CustomMonoBehaviour
             || target.GetComponent<EditingObject>() == null)
             return;
 
+        // 오브젝트 생성
         GameObject newObject = Instantiate(target, transform);
-        newObject.transform.position = newPos;
+
+        // 오브젝트 위치 지정
+        float height = (newObject.GetComponent<Collider>()?.bounds.size.y ?? 0) * 0.5f;
+        newObject.transform.position = new Vector3(newPos.x, height, newPos.z);
         newObject.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
 
+        // 오브젝트 캐싱
         EditingObject customObject = newObject.GetComponent<EditingObject>();
         _objectDic.Add(newPos, customObject);
     }
