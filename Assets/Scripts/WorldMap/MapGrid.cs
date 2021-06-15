@@ -65,6 +65,10 @@ public class MapGrid : CustomMonoBehaviour
         if (transform.Find(_gridAreaObjectName) != null)
             DestroyImmediate(transform.Find(_gridAreaObjectName).gameObject);
 
+        // 이전 Guide 오브젝트 제거
+        if (_curGuideObject != null)
+            DestroyImmediate(_curGuideObject);
+
         MapEditorStart = false;
     }
 
