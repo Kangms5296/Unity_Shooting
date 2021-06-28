@@ -7,7 +7,7 @@ using UnityEngine;
 public class MapGrid : CustomMonoBehaviour
 {
     [Header("Grid Info")]
-    [SerializeField] private GameObject _gridAreaObject = null;
+    [SerializeField] private GameObject _gridAreaObjectPrefab = null;
     [SerializeField] private int _halfXSize = 10;
     [SerializeField] private int _halfZSize = 10;
     [SerializeField] private Color _color = Color.white;
@@ -23,6 +23,14 @@ public class MapGrid : CustomMonoBehaviour
     [HideInInspector] public List<GameObject> _cachedObjects = null;
 
     private const string _gridAreaObjectName = "GridAreaObject";
+    private GameObject _gridAreaObject = null;
+
+    private const string _objectContainerName = "ObjectContainer";
+    private GameObject _objectContainer = null;
+
+    private const string _guideObjectParentName = "GuideObjectParent";
+    private GameObject _guideObjectParent = null;
+    private GameObject _guideObject = null;
 
     private Dictionary<Vector3, EditingObject> _objectDic = new Dictionary<Vector3, EditingObject>();
 
@@ -33,20 +41,46 @@ public class MapGrid : CustomMonoBehaviour
     /// </summary>
     public void StartMapEditor()
     {
+        if (_gridAreaObjectPrefab == null)
+            return;
+
         if (MapEditorStart)
             return;
 
         // Base Touch Area 생성
-        if (_gridAreaObject != null)
+        if (_gridAreaObject == null)
         {
-            GameObject temp = Instantiate(_gridAreaObject, transform);
+            GameObject newObj = Instantiate(_gridAreaObjectPrefab, transform);
+            newObj.transform.position = transform.position + new Vector3(0, -0.1f, 0);
+            newObj.transform.localScale = new Vector3(_halfXSize * _cellSize * 0.2f, 1, _halfZSize * _cellSize * 0.2f);
+            newObj.name = _gridAreaObjectName;
 
-            temp.transform.position = transform.position + new Vector3(0, -0.1f, 0);
-            temp.transform.localScale = new Vector3(_halfXSize * _cellSize * 0.2f, 1, _halfZSize * _cellSize * 0.2f);
-            temp.name = _gridAreaObjectName;
+            _gridAreaObject = newObj;
         }
 
-        // Guide Object 생성
+        // Object Container 생성
+        if (_objectContainer == null)
+        {
+            var newObj = new GameObject();
+            newObj.transform.SetParent(transform);
+            newObj.name = _objectContainerName;
+            newObj.layer = LayerMask.NameToLayer("Ground");
+
+            _objectContainer = newObj;
+        }
+
+        // Guide Object 생성 -1
+        if (_guideObjectParent == null)
+        {
+            var newObj = new GameObject();
+            newObj.transform.SetParent(transform);
+            newObj.name = _guideObjectParentName;
+            newObj.layer = LayerMask.NameToLayer("Ground");
+
+            _guideObjectParent = newObj;
+        }
+
+        // Guide Object 생성 -2
         if (_curSelectIndex != -1)
             OnChangeGuideObject(_cachedObjects[_curSelectIndex]);
 
@@ -61,35 +95,86 @@ public class MapGrid : CustomMonoBehaviour
         if (!MapEditorStart)
             return;
 
-        // Base Touch Area 제거
-        if (transform.Find(_gridAreaObjectName) != null)
-            DestroyImmediate(transform.Find(_gridAreaObjectName).gameObject);
+        _objectDic.Clear();
 
-        // Guide 오브젝트 제거
-        if (_curGuideObject != null)
-            DestroyImmediate(_curGuideObject);
+        // Base Touch Area 제거
+        if (_gridAreaObject != null)
+            DestroyImmediate(_gridAreaObject);
+        _gridAreaObject = null;
+
+        // Object Container 제거
+        if (_objectContainer != null)
+            DestroyImmediate(_objectContainer);
+        _objectContainer = null;
+
+        // Guide Object 제거
+        if (_guideObjectParent != null)
+            DestroyImmediate(_guideObjectParent);
+        _guideObjectParent = null;
+        _guideObject = null;
 
         MapEditorStart = false;
     }
 
     /// <summary>
-    /// GridAreaObject 재생성
+    /// GridAreaObject 이어서 진행
     /// </summary>
-    public void RegenerateGridAreaObject()
+    public void ContinueMapEditor()
     {
-        // Base Touch Area 제거
-        if (transform.Find(_gridAreaObjectName) != null)
-            DestroyImmediate(transform.Find(_gridAreaObjectName).gameObject);
+        _objectDic.Clear();
+        /*
+         * _objectDic 캐싱
+         */
 
-        // Base Touch Area 생성
-        if (_gridAreaObject != null)
+
+
+        // Base Touch Area
+        if (transform.Find(_gridAreaObjectName) != null)
+            _gridAreaObject = transform.Find(_gridAreaObjectName).gameObject;
+        else
         {
-            GameObject temp = Instantiate(_gridAreaObject, transform);
+            GameObject temp = Instantiate(_gridAreaObjectPrefab, transform);
 
             temp.transform.position = transform.position + new Vector3(0, -0.1f, 0);
             temp.transform.localScale = new Vector3(_halfXSize * _cellSize * 0.2f, 1, _halfZSize * _cellSize * 0.2f);
             temp.name = _gridAreaObjectName;
+
+            _gridAreaObject = temp;
         }
+
+        // Object Container
+        if (transform.Find(_objectContainerName) != null)
+            _objectContainer = transform.Find(_objectContainerName).gameObject;
+        else
+        {
+            var newObj = new GameObject();
+            newObj.transform.SetParent(transform);
+            newObj.name = _objectContainerName;
+            newObj.layer = LayerMask.NameToLayer("Ground");
+
+            _objectContainer = newObj;
+        }
+
+        // Guide Object
+        if (transform.Find(_guideObjectParentName) != null)
+            DestroyImmediate(transform.Find(_guideObjectParentName).gameObject);
+        _guideObjectParent = null;
+        _guideObject = null;
+
+        if (_guideObjectParent == null)
+        {
+            var newObj = new GameObject();
+            newObj.transform.SetParent(transform);
+            newObj.name = _guideObjectParentName;
+            newObj.layer = LayerMask.NameToLayer("Ground");
+
+            _guideObjectParent = newObj;
+        }
+
+        if (_curSelectIndex != -1)
+            OnChangeGuideObject(_cachedObjects[_curSelectIndex]);
+
+        MapEditorStart = true;
     }
 
     public Vector3 CalGridPosition(Vector3 pos)
@@ -110,7 +195,7 @@ public class MapGrid : CustomMonoBehaviour
             return;
 
         // 오브젝트 생성
-        GameObject newObject = Instantiate(target, transform);
+        GameObject newObject = Instantiate(target, _objectContainer.transform);
 
         // 오브젝트 위치 지정
         float height = (newObject.GetComponent<Collider>()?.bounds.size.y ?? 0) * 0.5f;
@@ -120,6 +205,8 @@ public class MapGrid : CustomMonoBehaviour
         // 오브젝트 캐싱
         EditingObject customObject = newObject.GetComponent<EditingObject>();
         _objectDic.Add(newPos, customObject);
+
+        EditorUtility.SetDirty(this);
     }
 
     /// <summary>
@@ -144,9 +231,10 @@ public class MapGrid : CustomMonoBehaviour
         if (key != Vector3.zero)
             _objectDic.Remove(key);
         DestroyImmediate(target);
+
+        EditorUtility.SetDirty(this);
     }
 
-    private GameObject _curGuideObject = null;
     private float _curGuideObjectHeight = 0;
     public void OnChangeGuideObject(GameObject newGuideObject)
     {
@@ -154,34 +242,34 @@ public class MapGrid : CustomMonoBehaviour
             return;
 
         // 이전 Guide 오브젝트 제거
-        if (_curGuideObject != null)
-            DestroyImmediate(_curGuideObject);
+        if (_guideObject != null)
+            DestroyImmediate(_guideObject);
 
         // 새 Guide 오브젝트 생성
-        _curGuideObject = Instantiate(newGuideObject, transform);
+        _guideObject = Instantiate(newGuideObject, _guideObjectParent.transform);
 
         // Collider를 제거하므로, 미리 Height 값 계산 및 캐싱
-        _curGuideObjectHeight = (_curGuideObject.GetComponent<Collider>()?.bounds.size.y ?? 0) * 0.5f;
+        _curGuideObjectHeight = (_guideObject.GetComponent<Collider>()?.bounds.size.y ?? 0) * 0.5f;
 
         // 새 Guide 초기화
-        _curGuideObject.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-        _curGuideObject.GetComponent<Collider>().enabled = false;
-        _curGuideObject.SetActive(false);
+        _guideObject.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+        _guideObject.GetComponent<Collider>().enabled = false;
+        _guideObject.SetActive(false);
     }
 
     public void OnSetGuideObject(Vector3 newPos, bool setActive = true)
     {
-        if (_curGuideObject == null)
+        if (_guideObject == null)
             return;
 
         if (setActive == false)
         {
-            _curGuideObject.SetActive(false);
+            _guideObject.SetActive(false);
             return;
         }
 
-        _curGuideObject.SetActive(setActive);
-        _curGuideObject.transform.position = new Vector3(newPos.x, newPos.y + _curGuideObjectHeight, newPos.z);
+        _guideObject.SetActive(setActive);
+        _guideObject.transform.position = new Vector3(newPos.x, newPos.y + _curGuideObjectHeight, newPos.z);
     }
 
 #if UNITY_EDITOR

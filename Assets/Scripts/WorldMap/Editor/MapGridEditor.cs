@@ -18,16 +18,26 @@ public class MapGridEditor : Editor
     {
         base.OnInspectorGUI();
         EditorGUILayout.Space();
+        EditorGUILayout.Space();
 
-        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Map Editor", EditorStyles.boldLabel);
         if (GUILayout.Button("Start Map Editor"))
             StartMapEditor();
+        if (GUILayout.Button("Continue Map Editor"))
+            ContinueMapEditor();
         if (GUILayout.Button("End Map Editor"))
             EndMapEditor();
-        EditorGUILayout.EndHorizontal();
 
-        if (GUILayout.Button("Regenerate GridAreaObject"))
-            RegenerateGridAreaObject();
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField("Map Save", EditorStyles.boldLabel);
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Save Map"))
+            StartMapEditor();
+        if (GUILayout.Button("Load Map"))
+            EndMapEditor();
+        EditorGUILayout.EndHorizontal();
     }
 
     private void StartMapEditor()
@@ -40,9 +50,9 @@ public class MapGridEditor : Editor
         _grid.EndMapEditor();
     }
 
-    private void RegenerateGridAreaObject()
+    private void ContinueMapEditor()
     {
-        _grid.RegenerateGridAreaObject();
+        _grid.ContinueMapEditor();
     }
     #endregion
 
