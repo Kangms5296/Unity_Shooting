@@ -47,6 +47,8 @@ public class MapGrid : CustomMonoBehaviour
         if (MapEditorStart)
             return;
 
+        _objectDic.Clear();
+
         // Base Touch Area 생성
         if (_gridAreaObject == null)
         {
@@ -121,13 +123,6 @@ public class MapGrid : CustomMonoBehaviour
     /// </summary>
     public void ContinueMapEditor()
     {
-        _objectDic.Clear();
-        /*
-         * _objectDic 캐싱
-         */
-
-
-
         // Base Touch Area
         if (transform.Find(_gridAreaObjectName) != null)
             _gridAreaObject = transform.Find(_gridAreaObjectName).gameObject;
@@ -174,7 +169,28 @@ public class MapGrid : CustomMonoBehaviour
         if (_curSelectIndex != -1)
             OnChangeGuideObject(_cachedObjects[_curSelectIndex]);
 
+        // Cache Objects
+        _objectDic.Clear();
+        Transform perentTrans = _objectContainer.transform;
+        for (int i = 0; i < perentTrans.childCount; i++)
+        {
+            Transform childTrans = perentTrans.GetChild(i);
+            Vector3 heightToVector = new Vector3(0.0f, (childTrans.GetComponent<Collider>()?.bounds.size.y ?? 0) * 0.5f, 0.0f);
+
+            _objectDic.Add(childTrans.position - heightToVector, childTrans.GetComponent<EditingObject>());
+        }
+
         MapEditorStart = true;
+    }
+
+    public void SaveMap()
+    {
+        
+    }
+
+    public void LoadMap()
+    {
+
     }
 
     public Vector3 CalGridPosition(Vector3 pos)

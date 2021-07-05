@@ -34,9 +34,9 @@ public class MapGridEditor : Editor
         EditorGUILayout.LabelField("Map Save", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Save Map"))
-            StartMapEditor();
+            SaveMap();
         if (GUILayout.Button("Load Map"))
-            EndMapEditor();
+            LoadMap();
         EditorGUILayout.EndHorizontal();
     }
 
@@ -54,6 +54,17 @@ public class MapGridEditor : Editor
     {
         _grid.ContinueMapEditor();
     }
+
+    private void SaveMap()
+    {
+        _grid.SaveMap();
+    }
+
+    private void LoadMap()
+    {
+        _grid.LoadMap();
+    }
+
     #endregion
 
     #region Scene GUI
