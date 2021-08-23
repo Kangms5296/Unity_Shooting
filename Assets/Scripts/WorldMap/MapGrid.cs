@@ -8,8 +8,8 @@ public class MapGrid : CustomMonoBehaviour
 {
     [Header("Grid Info")]
     [SerializeField] private GameObject _gridAreaObjectPrefab = null;
-    [SerializeField] private int _halfXSize = 10;
-    [SerializeField] private int _halfZSize = 10;
+    [SerializeField] private int _halfXCount = 10;
+    [SerializeField] private int _halfZCount = 10;
     [SerializeField] private Color _color = Color.white;
 
     [Header("Cell Info")]
@@ -54,7 +54,7 @@ public class MapGrid : CustomMonoBehaviour
         {
             GameObject newObj = Instantiate(_gridAreaObjectPrefab, transform);
             newObj.transform.position = transform.position + new Vector3(0, -0.1f, 0);
-            newObj.transform.localScale = new Vector3(_halfXSize * _cellSize * 0.2f, 1, _halfZSize * _cellSize * 0.2f);
+            newObj.transform.localScale = new Vector3(_halfXCount * _cellSize * 0.2f, 1, _halfZCount * _cellSize * 0.2f);
             newObj.name = _gridAreaObjectName;
 
             _gridAreaObject = newObj;
@@ -131,7 +131,7 @@ public class MapGrid : CustomMonoBehaviour
             GameObject temp = Instantiate(_gridAreaObjectPrefab, transform);
 
             temp.transform.position = transform.position + new Vector3(0, -0.1f, 0);
-            temp.transform.localScale = new Vector3(_halfXSize * _cellSize * 0.2f, 1, _halfZSize * _cellSize * 0.2f);
+            temp.transform.localScale = new Vector3(_halfXCount * _cellSize * 0.2f, 1, _halfZCount * _cellSize * 0.2f);
             temp.name = _gridAreaObjectName;
 
             _gridAreaObject = temp;
@@ -196,7 +196,7 @@ public class MapGrid : CustomMonoBehaviour
     public Vector3 CalGridPosition(Vector3 pos)
     {
         Vector3 newPos = new Vector3(Mathf.Floor(pos.x / _cellSize) * _cellSize + _cellSize / 2f,
-         Mathf.Floor((pos.y + 0.1f) / _cellSize), Mathf.Floor(pos.z / _cellSize) * _cellSize + _cellSize / 2f);
+         Mathf.Floor((pos.y + 0.1f) / _cellSize) * _cellSize, Mathf.Floor(pos.z / _cellSize) * _cellSize + _cellSize / 2f);
 
         return newPos;
     }
@@ -214,13 +214,13 @@ public class MapGrid : CustomMonoBehaviour
         GameObject newObject = Instantiate(target, _objectContainer.transform);
 
         // 오브젝트 위치 지정
-        float height = (newObject.GetComponent<Collider>()?.bounds.size.y ?? 0) * 0.5f;
+        float height = (newObject.GetComponent<Collider>()?.bounds.size.y ?? 0) * _cellSize * 0.5f;
         newObject.transform.position = new Vector3(newPos.x, newPos.y + height, newPos.z);
         newObject.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
 
         // 오브젝트 캐싱
         EditingObject customObject = newObject.GetComponent<EditingObject>();
-        _objectDic.Add(newPos, customObject);
+        _objectDic.Add(newObject.transform.position, customObject);
 
         EditorUtility.SetDirty(this);
     }
@@ -265,7 +265,7 @@ public class MapGrid : CustomMonoBehaviour
         _guideObject = Instantiate(newGuideObject, _guideObjectParent.transform);
 
         // Collider를 제거하므로, 미리 Height 값 계산 및 캐싱
-        _curGuideObjectHeight = (_guideObject.GetComponent<Collider>()?.bounds.size.y ?? 0) * 0.5f;
+        _curGuideObjectHeight = (_guideObject.GetComponent<Collider>()?.bounds.size.y ?? 0) * _cellSize * 0.5f;
 
         // 새 Guide 초기화
         _guideObject.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
@@ -296,8 +296,8 @@ public class MapGrid : CustomMonoBehaviour
             return;
 
         if (_cellSize <= 0
-            || _halfXSize < 0
-            || _halfZSize < 0)
+            || _halfXCount < 0
+            || _halfZCount < 0)
             return;
 
         Gizmos.color = _color;
@@ -308,17 +308,17 @@ public class MapGrid : CustomMonoBehaviour
             , Mathf.Floor(transform.position.z / _cellSize) * _cellSize);
 
         // Vertical Grid 표시
-        for (float z = pos.z - _halfZSize * _cellSize; z <= pos.z + _halfZSize * _cellSize; z += _cellSize)
+        for (float z = pos.z - _halfZCount * _cellSize; z <= pos.z + _halfZCount * _cellSize; z += _cellSize)
         {
-            Gizmos.DrawLine(new Vector3(_halfXSize * _cellSize + pos.x, pos.y, Mathf.Floor(z / _cellSize) * _cellSize),
-            new Vector3(-_halfXSize * _cellSize + pos.x, pos.y, Mathf.Floor(z / _cellSize) * _cellSize));
+            Gizmos.DrawLine(new Vector3(_halfXCount * _cellSize + pos.x, pos.y, Mathf.Floor(z / _cellSize) * _cellSize),
+            new Vector3(-_halfXCount * _cellSize + pos.x, pos.y, Mathf.Floor(z / _cellSize) * _cellSize));
         }
 
         // Horizontal Grid 표시
-        for (float x = pos.x - _halfXSize * _cellSize - _cellSize; x < pos.x + _halfXSize * _cellSize; x += _cellSize)
+        for (float x = pos.x - _halfXCount * _cellSize - _cellSize; x < pos.x + _halfXCount * _cellSize; x += _cellSize)
         {
-            Gizmos.DrawLine(new Vector3(Mathf.Floor(x / _cellSize) * _cellSize + _cellSize, pos.y, _halfZSize * _cellSize + pos.z),
-            new Vector3(Mathf.Floor(x / _cellSize) * _cellSize + _cellSize, pos.y, -_halfZSize * _cellSize + pos.z));
+            Gizmos.DrawLine(new Vector3(Mathf.Floor(x / _cellSize) * _cellSize + _cellSize, pos.y, _halfZCount * _cellSize + pos.z),
+            new Vector3(Mathf.Floor(x / _cellSize) * _cellSize + _cellSize, pos.y, -_halfZCount * _cellSize + pos.z));
         }
     }
 #endif
